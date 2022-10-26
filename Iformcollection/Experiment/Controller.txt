@@ -1,0 +1,62 @@
+﻿        [HttpPost]
+        public IActionResult TakeAction(CommercialLabAnalysisReportEF obj, IFormCollection collection)
+        {
+            UserLoginSession profile = HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+            string[] SampleNos = collection["SampleNo"].ToString().Split(char.Parse(","));
+            string[] RedicalIDs = collection["RedicalID"].ToString().Split(char.Parse(","));
+            string[] SamplePercentages = collection["SamplePercentage"].ToString().Split(char.Parse(","));
+            DataTable dtapprovedetails = new DataTable();
+            dtapprovedetails.Columns.Add("SampleNo", typeof(string));
+            dtapprovedetails.Columns.Add("RedicalID", typeof(string));
+            dtapprovedetails.Columns.Add("SamplePercentage", typeof(string));
+            for (int i = 0; i < SampleNos.Length; i++)
+            {
+                if (string.IsNullOrEmpty(SampleNos[i].ToString()) == false)
+                {
+                    dtapprovedetails.Rows.Add(SampleNos[i], RedicalIDs[i], SamplePercentages[i]);
+                }
+            }
+            obj.DtApproveDetails = dtapprovedetails;
+            obj.UserId = profile.UserId;
+            //if (ModelState.IsValid)
+            //{
+                string uniqueordercopy = "";
+                string uniqueordercopypath = "";
+                if (obj.CoveringLetterCopy != null)
+                {
+
+                    string uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "Upload/LabAnalysis");
+                    uniqueordercopy = Guid.NewGuid().ToString() + "_" + obj.CoveringLetterCopy.FileName;
+                    uniqueordercopypath = Path.Combine(uploadsFolder, uniqueordercopy);
+                    obj.CoveringLetterCopy.CopyTo(new FileStream(uniqueordercopypath, FileMode.Create));
+                }
+                obj.CoveringLetterCopy = null;
+                obj.CoveringLetter = uniqueordercopy;
+                if(obj.Status==1)
+                {
+                    //call approveReport
+                    messageEF = objCommercialLabAnalysisReportModel.RepotUpload(obj);//add approveReport and rejectReport
+                }
+                else if (obj.Status == 2)
+                {
+                    //call rejectReport
+                    messageEF = objCommercialLabAnalysisReportModel.RejectRepotUpload(obj);//add approveReport and rejectReport
+                }
+                
+                if (messageEF.Satus == "1")
+                {
+                    TempData["Status"] = "1";
+                    if (obj.Status ==1)
+                    {
+                        TempData["Message"] = "Request Approved Successfully";
+                    }
+                    if (obj.Status ==2)
+                    {
+                        TempData["Message"] = "Request Rejected Successfully";
+                    }
+                    //add sms and mail coding here
+                }
+
+            //}
+            return RedirectToAction("TakeAction");
+        }

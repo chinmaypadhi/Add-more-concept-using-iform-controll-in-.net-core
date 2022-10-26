@@ -1,0 +1,731 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : TakeAction
+    //  Desciption               : Lab Analysis Action details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 14 April 2022
+    // ********************************************************************************************************
+*@
+@model IEnumerable<GeologyEF.CommercialLabAnalysisReportEF>
+@{
+    ViewData["Title"] = "TakeAction";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<script>
+    $(document).ready(function () {
+        loadNavigation('TakeAction', 'gl', 'pl', 'tl', 'Commercial Lab Analysis', 'Take Acition', ' ');
+
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MMM-YYYY',
+            daysOfWeekDisabled: [],
+        });
+    });
+</script>
+@if (TempData["Status"] != null)
+{
+<script>
+    var vv = '@TempData["Status"]';
+    if (vv == '1') {
+        swal("", "@TempData["Message"]", "success");
+    }
+    else {
+        swal("", "@TempData["Message"]", "error");
+    }
+</script>
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="searchform px-3 py-3">
+                        <div class="row align-items-lg-center form-group">
+                            <label class="col-lg-1 col-md-4 col-sm-12 col-form-label">From Date</label>
+                            <div class="col-lg-2 col-md-6 col-sm-12 mb-lg-0 mb-3">
+                                <div class="input-group">
+                                    <input id="txtTenderDate1" type="text" class="form-control datepicker">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="txtTenderDate1"><i class="icon-calendar-alt-solid"></i></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <label class="col-lg-1 col-md-4 col-sm-12 col-form-label">To Date</label>
+                            <div class="col-lg-2 col-md-6 col-sm-12 mb-lg-0 mb-3">
+                                <div class="input-group">
+                                    <input id="txtTenderDate2" type="text" class="form-control datepicker">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="txtTenderDate2"><i class="icon-calendar-alt-solid"></i></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-2">
+                                <button class="btn btn-md btn-success m-0" id="btnShow">Search</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="20px">Sl#</th>
+                                            <th>Application No.</th>
+                                            <th>Applied on</th>
+                                            <th>Status</th>
+                                            <th width="150" class="text-center">Action</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int i = 1;
+                                            foreach (var item in ViewBag.ViewList)
+                                            {
+                                            <tr>
+                                                <td>@i</td>
+                                                <td>
+                                                    <a data-toggle="modal" id="@item.ApplicationNo" data-target="#LabAnalysis-details" onclick="GetLabAnalysisDetailsByIDindex(@item.LabAnalysisID)" class="text-primary">@item.ApplicationNo</a>
+                                                    <small class="d-block">@item.ApplicantName</small><br />@item.CreatedOn
+                                                </td>
+                                                <td>@item.CreatedOn</td>
+                                                <td>
+                                                    @{
+                                                        if (item.Status == 3)
+                                                        {
+                                                            <span class="text-warning">New Request for <strong> Approved for LabAnalysis Registration on date</strong> on @item.CreatedOn</span>
+                                                        }                                                      
+                                                    }
+                                                </td>
+                                                <td class="text-center">
+                                                    @{                                                   
+                                                        <a id="takeactionfile" class="btn btn-success btn-sm text-capitalize mb-2" onclick="GetLabAnalysisDetailsByID(@item.LabAnalysisID)" data-toggle="modal" data-target="#exampleModal2">Take Action</a>
+                                                    }
+                                                </td>
+                                            </tr>
+                                            i++;
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<div class="modal fade" id="LabAnalysis-details" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="exampleModalLabel">
+                    View Details <span id="ApplicationNo1"></span>
+                </h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body mineral-concesion-details">
+                <div class="row">
+                    <div class="col-12"><h5>Applicant Details</h5></div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Applicant Name</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="ApplicantName1" class="form-control-plaintext"><span class="colon">:</span> </label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Organization Name</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="OrganizationName1" class="form-control-plaintext">
+                            <span class="colon">:</span>
+                        </label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Phone No.</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="MobileNo1" class="form-control-plaintext">
+                            <span class="colon">:</span>
+                        </label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">E-mail</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="EmailID1" class="form-control-plaintext">
+                            <span class="colon">:</span>
+                        </label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">District</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="DistrictName1" class="form-control-plaintext">
+                            <span class="colon">:</span>
+                        </label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Block</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="BlockName1" class="form-control-plaintext">
+                            <span class="colon">:</span>
+                        </label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">
+                        Pin Code
+                    </label>
+                    <div class="col-lg-3 col-12">
+                        <label id="PinCode1" class="form-control-plaintext">
+                            <span class="colon">:</span>
+                        </label>
+                    </div>
+
+
+                    <label class="col-lg-3 col-12 col-form-label">Complete postal address</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="Address1" class="form-control-plaintext">
+                            <span class="colon">:</span>
+                        </label>
+                    </div>
+
+
+                    <label class="col-lg-3 col-12 col-form-label">Area in Hectares</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="AreaInHector1" class="form-control-plaintext">
+                            <span class="colon">:</span>
+                        </label>
+                    </div>
+
+                    <div class="col-12"><h5>Sample Details</h5></div>
+
+                    <div class="col-lg-12">
+                        <div class="table-responsive mt-3">
+                            <table id="DetailTable" class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Sample No.</th>
+                                        <th>Type of Sample</th>
+                                        <th>Sample Description</th>
+                                        <th>Desire Radical / Element in Sample</th>
+                                        <th>Sample Received Place</th>
+                                        <th>If Sample collected from any mines then( Order number and date/ Borehole /Pit /Trench)</th>
+                                        <th>R.P / Gram/ Tahshil/ District/ Area</th>
+                                        <th>Aim of research work/ Survey/ Mining</th>
+                                        <th>Remarks</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="exampleModalLabel">
+                    File Upload |  <span id="ApplicationNo"></span>
+                </h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body mineral-concesion-details">
+
+                <div class="form-group row">
+                    <label for="inputPassword" class="col-lg-4 col-form-label">Covering letter <span class="text-danger">*</span></label>
+                    <div class="col-lg-5">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input">
+                            <label class="custom-file-label">Choose file...</label>
+                        </div>
+                        <small class="text-danger">Files type <strong>(.pdf , .docx)</strong> with maximum <strong>2MB</strong></small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="FileUpload()" data-dismiss="modal" data-toggle="modal" data-target="#security-msg">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade take-action-model" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="exampleModalLabel">
+                    Take Action <span id="ApplicationNo"></span>
+                </h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body mineral-concesion-details">
+                <form id="form1" action="/Geology/CommercialLabAnalysisReport/TakeAction" method="post" enctype="multipart/form-data">
+                    <div class="row mb-3">
+                        <label class="col-lg-4 col-12 col-form-label">Name of the applicant</label>
+                        <div class="col-lg-8 col-12">
+                            <label id="ApplicantName" class="form-control-plaintext font-weight-bold"></label>
+                        </div>
+
+                        <label class="col-lg-4 col-12 col-form-label">District</label>
+                        <div class="col-lg-8 col-12">
+                            <label id="DistrictName" class="form-control-plaintext font-weight-bold">
+                            </label>
+                        </div>
+
+                        <label class="col-lg-4 col-12 col-form-label">Block</label>
+                        <div class="col-lg-8 col-12">
+                            <label id="BlockName" class="form-control-plaintext font-weight-bold">
+                            </label>
+                        </div>
+
+                        <label class="col-lg-4 col-12 col-form-label">Address</label>
+                        <div class="col-lg-8 col-12">
+                            <label id="Address" class="form-control-plaintext font-weight-bold">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="inputPassword" class="col-lg-4 col-form-label">Covering letter <span class="text-danger">*</span></label>
+                        <div class="col-lg-5">
+                            <div class="custom-file">
+                                <input id="CoveringLetter" name="CoveringLetterCopy" type="file" class="custom-file-input">
+                                <label class="custom-file-label">Choose file...</label>
+                            </div>
+                            <small class="text-danger">Files type <strong>(.pdf , .docx)</strong> with maximum <strong>2MB</strong></small>
+                        </div>
+                    </div>
+
+                    <div class="bg-light p-3 mb-3">
+                        <div class="form-group row">
+                            <label for="inputPassword" class="col-lg-4 col-form-label">Sample No.</label>
+                            <div class="col-lg-5">
+                                <input id="SampleNo" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="inputPassword" class="col-lg-4 col-form-label">Desire Radical /Element in Sample</label>
+                            <div class="col-lg-5">
+                                <select id="RedicalID" class="form-control">
+                                    <option hidden value="0">Select</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="inputPassword" class="col-lg-4 col-form-label">Sample Percentage</label>
+                            <div class="col-lg-5">
+                                <input id="SamplePercentage" type="text" class="form-control">
+                            </div>
+                        </div>
+
+
+                        <div class="form-group row">
+                            <label class="col-lg-4 col-form-label"></label>
+                            <div class="col-lg-5">
+                                <button type="button" id="btnAddMore" class="btn btn-success"><i class="icon-plus-solid pr-1"></i>Add More</button>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="table-responsive mt-3">
+                        <table id="tblAddMore" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th width="30px">Sl#</th>
+                                    <th>Sample No.</th>
+                                    <th>Desire Radical /Element in Sample</th>
+                                    <th>Sample Percentage</th>
+                                    <th width="100px">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="inputPassword" class="col-lg-4 col-form-label">Remark <span class="text-danger">*</span></label>
+                        <div class="col-lg-8">
+                            <textarea id="ApprovalRemarks" name="ApprovalRemarks" class="form-control" rows="3"></textarea>
+
+                            <small class="text-danger">Maximum character should be <strong>500</strong></small>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <input id="LabAnalysisID" type="hidden" name="LabAnalysisID" class="form-control">
+                    </div>
+                    <input type="hidden" id="LabAnalysisID" name="LabAnalysisID" value="" />
+                    <input type="hidden" id="Status" name="Status" value="" />
+                    <input type="hidden" id="ReportID" name="ReportID" value="" />
+
+                </form>
+            </div>
+            <div class="modal-footer">
+
+                <input type="hidden" id="CheckType" name="CheckType" />
+                <input type="button" id="approve" onclick="Approve('1')" class="btn btn-success" value="Approve" />
+                <input type="button" id="reject" class="btn btn-danger" onclick="Approve('2')" value="Reject" />
+                @*<button type="button" class="btn btn-success" data-dismiss="modal" data-toggle="modal" data-target="#security-msg" onclick="approve('fdf')">Approve</button>
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">Reject</button>*@
+            </div>
+            
+        </div>
+    </div>
+</div>
+<script>
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+            console.log('Connection failed');
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+            }
+        };
+    }
+    catch (e) {
+        swal("", "No DSC Connection Found", "warning");
+    }
+    $(document).ready(function () {
+        //for dropdown
+        debugger;
+        $.ajax({
+            type: "POST",
+            url: '@Url.Content("~/Geology/CommercialLabAnalysisReport/GetRedicalElementList")',
+            dataType: "json",
+            data: '',
+            contentType: "application/json",
+            success: function (data) {
+                debugger;
+               // var data = JSON.parse(response);
+
+                for (var i = 0; i < data.length; i++) {
+                    $("#RedicalID").append("<option  value='" + data[i].redicalID +"'> " + data[i].redicalname + "</option>");
+
+                }
+            }
+        });
+    });
+    $("#btnAddMore").click(function () {
+        if ($("#SampleNo").val() == "") {
+            swal("", "Please Enter The Sample No.", "warning");
+            $("#SampleNo").focus();
+            return false;
+        }
+        else if ($("#RedicalID").val() == '0') {
+            swal("", "Please Select Desire Radical / Element in Sample", "warning");
+            $("#RedicalID option:selected").focus();
+            return false;
+        }
+        else if ($("#SamplePercentage").val() == "") {
+            swal("", "Please Enter Sample Percentage", "warning");
+            $("#SamplePercentage").focus();
+            return false;
+        }
+
+        else {
+            debugger;
+            var table = document.getElementById("tblAddMore").getElementsByTagName('tbody')[0];
+            var rowCount = table.rows.length;
+            var row = table.insertRow(rowCount);
+            //Column 0
+            var cell0 = row.insertCell(0);
+            cell0.innerHTML = rowCount + 1;
+            //Column 1
+            var cell1 = row.insertCell(1);
+            cell1.innerHTML = $("#SampleNo").val();
+            var ele1 = document.createElement("input");
+            ele1.type = "hidden";
+            ele1.name = "SampleNo";
+            ele1.value = $("#SampleNo").val();
+            cell1.appendChild(ele1);
+            //Column 2
+            var cell2 = row.insertCell(2);
+            cell2.innerHTML = $("#RedicalID option:selected").text();
+            var ele2 = document.createElement("input");
+            ele2.type = "hidden";
+            ele2.name = "RedicalID";
+            ele2.value = $("#RedicalID").val();
+            cell2.appendChild(ele2);
+            //Column 3
+            var cell3 = row.insertCell(3);
+            cell3.innerHTML = $("#SamplePercentage").val();
+            var ele3 = document.createElement("input");
+            ele3.type = "hidden";
+            ele3.name = "SamplePercentage";
+            ele3.value = $("#SamplePercentage").val();
+            cell3.appendChild(ele3);
+            //Column 4
+            var cell4 = row.insertCell(4);
+            var ele4 = document.createElement("a");
+            ele4.setAttribute("class", "btn btn-danger btn-sm")
+            ele4.innerHTML = "<i class='icon-trash-alt-solid'></i></a>";
+            ele4.onclick = function () { remove(this); }
+            cell4.appendChild(ele4);
+        }
+
+
+    });
+    function remove(button) {
+        //Determine the reference of the Row using the Button.
+        var row = button.parentNode.parentNode;
+        if (confirm("Do you want to delete! ")) {
+
+            //Get the reference of the Table.
+            var table = document.getElementById("tblAddMore");
+
+            //Delete the Table row using it's Index.
+            table.deleteRow(row.rowIndex);
+        }
+    }
+    $('#CoveringLetter').on('change', function () {
+        debugger;
+        var fileExtension = ['jpg', 'jpeg', 'png', 'pdf'];
+        if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+            swal("", "Only formats are allowed : " + fileExtension.join(', '), "warning");
+            $(this).focus();
+            return false;
+        }
+
+        if (Number(this.files[0].size) > 2097152) {
+            swal("", 'Please upload file less than 2MB!', "warning");
+            $(this).val('');
+            $(this).focus();
+            return false;
+        }
+        else {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).next('.custom-file-label').html(fileName);
+        }
+
+    });
+    //For Search button
+    $("#btnShow").click(function () {
+        debugger;
+            $.ajax({
+                type: "POST",
+                url: "/Geology/CommercialLabAnalysisReport/GetSearchableData",
+                data: {},
+                    success: function (response) {
+
+
+                    }
+                });
+        });
+
+    //for popup
+    function GetLabAnalysisDetailsByID(LabAnalysisID, CheckType) {
+        debugger;
+        $('#LabAnalysisID').val(LabAnalysisID);
+        $('#CheckType').val(CheckType);
+        $.ajax({
+            type: "post",
+            url: "/Geology/CommercialLabAnalysisReport/GetLabAnalysisDetailsByID",
+            data: { 'LabAnalysisID': LabAnalysisID },
+            datatype: "json",
+            success: function (data) {
+                console.log(data);
+                $('#ApplicationNo').text(data.applicationNo);
+                $('#ApplicantName').text(data.applicantName);
+                $('#DistrictName').text(data.blockName);
+                $('#BlockName').text(data.districtName);
+                $('#Address').text(data.address);
+
+            }
+        });
+    }
+    function GetLabAnalysisDetailsByIDindex(LabAnalysisID, CheckType) {
+        $('#CheckType').val(CheckType);
+        $.ajax({
+            type: "post",
+            url: "/Geology/CommercialLabAnalysisReport/GetLabAnalysisDetailsByID",
+            data: { 'LabAnalysisID': LabAnalysisID },
+            datatype: "json",
+            success: function (data) {
+                console.log(data);
+                $('#ApplicationNo1').text(data.applicationNo);
+                $('#ApplicantName1').text(data.applicantName);
+                $('#DistrictName1').text(data.blockName);
+                $('#BlockName1').text(data.districtName);
+                $('#Address1').text(data.address);
+                $('#OrganizationName1').text(data.organizationName);
+                $('#MobileNo1').text(data.mobileNo);
+                $('#EmailID1').text(data.emailID);
+                $('#PinCode1').text(data.pinCode);
+                $('#AreaInHector1').text(data.AreaInHector);
+                $("#DetailTable tbody").empty();
+                var text = "<tr><td>" + data.sampleNo + "</td><td>" + data.sampleType + "</td><td>" + data.sampleDescription + "</td><td>" + data.radicalName + "</td><td>" + data.sampleReceivedPlace + "</td><td>" + data.grantOrderDate + "</td><td>" + data.areaAddress + "</td><td>" + data.aimOfMining + "</td><td>" + data.remarks + "</td></tr>"
+                $("#DetailTable").find('tbody').append(text);
+            }
+        });
+    }
+    function ChangeDateFormat(date) {
+        const formattedDate = new Date(date).toLocaleDateString('en-GB', {
+            day: 'numeric', month: 'short', year: 'numeric'
+        }).replace(/ /g, '-');
+        console.log(formattedDate);
+        return formattedDate;
+    }
+    function Approve(ApproveType) {
+        debugger;
+        //$('#AnnexureB_ID').val(AnnexureB_ID);
+        //$('#ApproveType').val(ApproveType);
+        $("#Status").val(ApproveType);
+        alert($("#Status").val());
+        if (confirm("Before Approving you need to apply your Digital Signature. Are you confirm to Proceed ?")) {
+            var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+            connection.send(Postdata);
+            connection.onerror = function (error) {
+                swal("", 'Please check the server connection: ' + error + '', "warning");
+                swal("", error, "warning");
+            };
+            connection.onmessage = function (e) { // when DSC is success then following function executed.
+                if (e.data.indexOf("subProtocol") == -1) {
+                    $.ajax(
+                        {
+                            async: false,
+                            url: '@Url.Action("CheckVerifyResponse", "CoalLessee", new { Area = "CoalGrade" })',
+                            type: "POST",
+                            data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                            success: function (msg) {
+                                if (msg == "SUCCESS") {
+                                    alert('fired');
+                                    $("#form1").submit();
+                                }
+                            }
+                        });
+                }
+                else {
+                    alert(e.data);
+                }
+            };
+        }
+        else {        [HttpPost]
+        public IActionResult TakeAction(CommercialLabAnalysisReportEF obj, IFormCollection collection)
+        {
+            UserLoginSession profile = HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+            string[] SampleNos = collection["SampleNo"].ToString().Split(char.Parse(","));
+            string[] RedicalIDs = collection["RedicalID"].ToString().Split(char.Parse(","));
+            string[] SamplePercentages = collection["SamplePercentage"].ToString().Split(char.Parse(","));
+            DataTable dtapprovedetails = new DataTable();
+            dtapprovedetails.Columns.Add("SampleNo", typeof(string));
+            dtapprovedetails.Columns.Add("RedicalID", typeof(string));
+            dtapprovedetails.Columns.Add("SamplePercentage", typeof(string));
+            for (int i = 0; i < SampleNos.Length; i++)
+            {
+                if (string.IsNullOrEmpty(SampleNos[i].ToString()) == false)
+                {
+                    dtapprovedetails.Rows.Add(SampleNos[i], RedicalIDs[i], SamplePercentages[i]);
+                }
+            }
+            obj.DtApproveDetails = dtapprovedetails;
+            obj.UserId = profile.UserId;
+            //if (ModelState.IsValid)
+            //{
+                string uniqueordercopy = "";
+                string uniqueordercopypath = "";
+                if (obj.CoveringLetterCopy != null)
+                {
+
+                    string uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "Upload/LabAnalysis");
+                    uniqueordercopy = Guid.NewGuid().ToString() + "_" + obj.CoveringLetterCopy.FileName;
+                    uniqueordercopypath = Path.Combine(uploadsFolder, uniqueordercopy);
+                    obj.CoveringLetterCopy.CopyTo(new FileStream(uniqueordercopypath, FileMode.Create));
+                }
+                obj.CoveringLetterCopy = null;
+                obj.CoveringLetter = uniqueordercopy;
+                if(obj.Status==1)
+                {
+                    //call approveReport
+                    messageEF = objCommercialLabAnalysisReportModel.RepotUpload(obj);//add approveReport and rejectReport
+                }
+                else if (obj.Status == 2)
+                {
+                    //call rejectReport
+                    messageEF = objCommercialLabAnalysisReportModel.RejectRepotUpload(obj);//add approveReport and rejectReport
+                }
+                
+                if (messageEF.Satus == "1")
+                {
+                    TempData["Status"] = "1";
+                    if (obj.Status ==1)
+                    {
+                        TempData["Message"] = "Request Approved Successfully";
+                    }
+                    if (obj.Status ==2)
+                    {
+                        TempData["Message"] = "Request Rejected Successfully";
+                    }
+                    //add sms and mail coding here
+                }
+
+            //}
+            return RedirectToAction("TakeAction");
+        }
+            return false;
+        }
+
+    }
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
