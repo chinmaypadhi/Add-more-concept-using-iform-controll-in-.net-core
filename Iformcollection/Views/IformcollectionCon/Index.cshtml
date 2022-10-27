@@ -2,34 +2,75 @@
 @{
     ViewData["Title"] = "Index";
 }
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<h1>Add more section</h1>
+Enter the id:
+<input type="text" id="txtId1"  />
+<br />
+    Enter the Name:
+<input type="text" id="txtName1"  />
+<br />
+    Enter the City:
+<input type="text" id="txtCity1" />
+<br />
 
-<h1>Index</h1>
+<button type="button" id="btnAddMore" onclick="addMore();" class="btn btn-success"><i class="icon-plus-solid pr-1"></i>Add More</button>
+
+
+------------------------------------------
 
 <form method="post" action="IformcollectionCon/add">
-    <table>
-        <tr>
-            <th>sl#</th>
-            <th>Name</th>
-            <th>City</th>
-        </tr>
+    <table id="tblAddMore">
+        <thead>
+            <tr>
+                <th>sl#</th>
+                <th>Name</th>
+                <th>City</th>
+            </tr>
+        </thead>
         <tbody>
-            <tr>
-                <td><input type="text" name="txt1" value="1" /></td>
-                <td><input type="text" name="txt2" value="chinmay" /></td>
-                <td><input type="text" name="txt3" value="bhadrak" /></td>
-            </tr>
-            <tr>
-                <td><input type="text" name="txt1" value="2" /></td>
-                <td><input type="text" name="txt2" value="chinmayn " /></td>
-                <td><input type="text" name="txt3" value="bhadrakk" /></td>
-            </tr>
-            @*<tr>
-            <td>2</td>
-            <td>abyakta</td>
-            <td>chandbali</td>
-        </tr>*@
         </tbody>
     </table>
+    Enter the id: <input type="text" id="txtId" name="SinglestudentId" /><br />
+    Enter the Name: <input type="text" id="txtName" name="SinglestudentName" /><br />
+    Enter the City: <input type="text" id="txtCity" name="SinglestudentCity" /><br />
+
     <input type="submit" />
 </form>
 
+<script>
+
+    function addMore() {
+        debugger;
+        var table = document.getElementById("tblAddMore").getElementsByTagName('tbody')[0];
+        var rowCount = table.rows.length;
+        var row = table.insertRow(rowCount);
+        //Column 0
+        var cell0 = row.insertCell(0);
+        cell0.innerHTML = rowCount + 1;
+        //Column 1
+        var cell1 = row.insertCell(1);
+        cell1.innerHTML = $("#txtId1").val();
+        var ele1 = document.createElement("input");
+        ele1.type = "hidden";
+        ele1.name = "id";
+        ele1.value = $("#txtId1").val();
+        cell1.appendChild(ele1);
+        //Column 2
+        var cell2 = row.insertCell(2);
+        cell2.innerHTML = $("#txtName1").val();
+        var ele2 = document.createElement("input");
+        ele2.type = "hidden";
+        ele2.name = "name";
+        ele2.value = $("#txtName1").val();
+        cell2.appendChild(ele2);
+        //Column 3
+        var cell3 = row.insertCell(3);
+        cell3.innerHTML = $("#txtCity1").val();
+        var ele3 = document.createElement("input");
+        ele3.type = "hidden";
+        ele3.name = "city";
+        ele3.value = $("#txtCity1").val();
+        cell3.appendChild(ele3);       
+    }
+</script>

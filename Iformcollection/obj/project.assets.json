@@ -6075,11 +6075,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Asus\\source\\repos\\Iformcollection\\Iformcollection\\Iformcollection.csproj",
+      "projectUniqueName": "C:\\Users\\Asus\\OneDrive\\Desktop\\IForm Collection add more concept\\Iformcollection\\Iformcollection.csproj",
       "projectName": "Iformcollection",
-      "projectPath": "C:\\Users\\Asus\\source\\repos\\Iformcollection\\Iformcollection\\Iformcollection.csproj",
+      "projectPath": "C:\\Users\\Asus\\OneDrive\\Desktop\\IForm Collection add more concept\\Iformcollection\\Iformcollection.csproj",
       "packagesPath": "C:\\Users\\Asus\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Asus\\source\\repos\\Iformcollection\\Iformcollection\\obj\\",
+      "outputPath": "C:\\Users\\Asus\\OneDrive\\Desktop\\IForm Collection add more concept\\Iformcollection\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
